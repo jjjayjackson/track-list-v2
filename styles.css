@@ -1,0 +1,163 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: black;
+  color: white;
+  min-height: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+}
+
+.main {
+  width: 100%;
+  max-width: 400px;
+  padding: 32px 20px 140px;
+  margin: 0 auto;
+}
+
+.queue {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  margin-top: 24px;
+}
+
+/* DAY GROUP */
+
+.day-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.labelfortheday {
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+  align-self: center;   /* centers only this element horizontally within the flex column,
+                           leaving all sibling track rows unaffected */
+}
+
+/* ==================== TRACK ROW CHANGES ==================== 
+   OLD: Underline was on .track-row using ::after pseudo-element
+   NEW: 
+   1. Made .track-row a flex container
+   2. Moved underline animation to .track-name only
+   3. Styled .delete-btn as a clean "x" with no background
+*/
+
+.track-row {
+  padding: 4px 8px;
+  font-size: 1.05rem;
+  user-select: none;
+  display: flex;              /* NEW: flex layout so delete btn + name sit side-by-side */
+  align-items: center;        /* NEW: vertical alignment */
+  gap: 8px;                   /* NEW: space between delete button and track name */
+  width: fit-content;         /* NEW: shrink to content instead of inline-block */
+}
+
+/* Delete button — clean "x" with no background */
+.delete-btn {
+  background: none;           /* NEW: no background */
+  border: none;
+  color: white;             /* NEW: subtle red color for delete */
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.delete-btn:hover {
+  opacity: 1;
+  color: white;             /* NEW: brighter red on hover */
+}
+
+/* Track name with underline effect (only this gets underlined now) */
+.track-name {
+  position: relative;         /* NEW: needed for absolute positioning of ::after */
+  cursor: pointer;
+  padding-bottom: 2px;        /* NEW: gives a little space for the underline */
+}
+
+.track-name::after {
+  content: "";                /* NEW: underline pseudo-element */
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: white;
+  transition: width 1s ease;
+}
+
+.track-name:hover::after {
+  width: 100%;                /* NEW: underline animation only on name hover */
+}
+
+.track-row:focus {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+/* INPUT */
+
+.input-section {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(500px, calc(100% - 24px));
+  border: 1px solid #2a3139;
+  border-radius: 18px;
+}
+
+#Input {
+  width: 100%;
+  border: 2px solid white;
+  background: black;
+  color: white;
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.month-timeline {
+  position: fixed;
+  right: 20px;
+  top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.linkofmonth {
+  background: transparent;
+  color: white;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+  font-size: 1.5rem;
+}
+
+.linkofmonth:hover {
+  opacity: 0.7;
+}
