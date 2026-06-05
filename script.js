@@ -15,6 +15,7 @@ const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const trackInput = document.getElementById("Input");
 const queue = document.getElementById("queue");
 const monthTimeline = document.getElementById("monthTimeline");
+const trackCount = document.getElementById("trackCount");
 
 let tracks = [];
 
@@ -129,6 +130,8 @@ function renderTracks() {
   queue.innerHTML = "";
   monthTimeline.innerHTML = "";
 
+  updateTrackCount();
+
   if (tracks.length === 0) return;
 
   const tracksFromEachDayBigGroup = groupTracksByDay();
@@ -200,6 +203,8 @@ function createRow(track) {
   nameSpan.addEventListener("click", () => {
     const q = encodeURIComponent(track.name);
     window.open(`https://www.youtube.com/results?search_query=${q}`, "_blank");
+
+    deleteTrack(track.id);
   });
 
   row.appendChild(deleteBtn);
@@ -215,5 +220,9 @@ trackInput.addEventListener("keydown", (e) => {
     addTrack();
   }
 });
+
+function updateTrackCount() {
+  trackCount.textContent = tracks.length;
+}
 
 document.addEventListener("DOMContentLoaded", loadTracks);

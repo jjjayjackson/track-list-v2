@@ -160,3 +160,13 @@ body {
 .linkofmonth:hover {
   opacity: 0.7;
 }
+
+.track-count {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  font-size: 4rem;
+  color: white;
+  opacity: 1;
+  user-select: none;
+}
