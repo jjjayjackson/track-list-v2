@@ -43,8 +43,7 @@ body {
 
 .labelfortheday {
   font-size: 1.1rem;
-  margin-bottom: 4px;
-  align-self: center;   /* centers only this element horizontally within the flex column,
+  margin-bottom: 4px;   /* centers only this element horizontally within the flex column,
                            leaving all sibling track rows unaffected */
 }
 

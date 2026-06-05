@@ -26,7 +26,7 @@ async function loadTracks() {
   const { data, error } = await db
     .from("track_list")
     .select("*")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: true });
 
   if (error) {
     console.error("Failed to load tracks:", error.message);
