@@ -39,7 +39,7 @@ async function loadTracks() {
   tracks = data.map((t) => ({
     id: t.id,
     name: t.name,
-    createdAt: t.created_at
+    createdAt: t.created_at,
   }));
 
   renderTracks();
@@ -53,7 +53,7 @@ async function addTrack() {
 
   const { error } = await db
     .from("track_list")
-    .insert({ name }); // We only send `name`; Supabase auto-fills `id` and `created_at`
+    .insert({ name });
 
   if (error) {
     console.error("Failed to add track:", error.message);
@@ -146,7 +146,7 @@ function renderTracks() {
 
     const dayLabel = document.createElement("div");
     dayLabel.className = "labelfortheday";
-    dayLabel.textContent = formatDay(tracksFromThatDay[0]);
+    dayLabel.textContent = `${formatDay(tracksFromThatDay[0])} (${tracksFromThatDay.length})`;
     dayGroup.appendChild(dayLabel);
 
     for (const track of tracksFromThatDay) {
