@@ -27,7 +27,7 @@ async function loadTracks() {
   const { data, error } = await db
     .from("track_list")
     .select("*")
-    .order("created_at", { ascending: true });
+    .order("position", { ascending: true });
 
   if (error) {
     console.error("Failed to load tracks:", error.message);
@@ -40,6 +40,7 @@ async function loadTracks() {
     id: t.id,
     name: t.name,
     createdAt: t.created_at,
+    position: t.position
   }));
 
   renderTracks();
@@ -53,7 +54,10 @@ async function addTrack() {
 
   const { error } = await db
     .from("track_list")
-    .insert({ name });
+    .insert({
+      name,
+      position: tracks.length + 1
+  });
 
   if (error) {
     console.error("Failed to add track:", error.message);
