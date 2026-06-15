@@ -84,6 +84,52 @@ async function deleteTrack(id) {
   await loadTracks(); // Re-fetch to keep UI in sync
 }
 
+async function moveTrack() {
+  if (!draggedId || !dropTargetId) return;
+
+  if (draggedId === dropTargetId) return;
+
+  const draggedIndex = tracks.findIndex(
+    (track) => track.id === draggedId
+  );
+
+  const targetIndex = tracks.findIndex(
+    (track) => track.id === dropTargetId
+  );
+
+  const [draggedTrack] = tracks.splice(draggedIndex, 1);
+
+  const insertIndex =
+    draggedIndex < targetIndex
+      ? targetIndex
+      : targetIndex + 1;
+
+  tracks.splice(insertIndex, 0, draggedTrack);
+
+  await savePositions();
+
+  draggedId = null;
+  dropTargetId = null;
+
+  await loadTracks();
+}
+
+async function savePositions() {
+  const updates = tracks.map((track, index) => ({
+    id: track.id,
+    name: track.name,
+    position: index + 1
+  }));
+
+  const { error } = await db
+    .from("track_list")
+    .upsert(updates);
+
+  if (error) {
+    console.error("Failed to save positions:", error.message);
+  }
+}
+
 // ==================== DATE HELPERS ====================
 // Nothing changed here — these just format dates for display.
 
@@ -192,6 +238,21 @@ function createRow(track) {
   const row = document.createElement("div");
   row.className = "track-row";
   row.dataset.id = track.id;
+
+  row.draggable = true;
+
+  row.addEventListener("dragstart", () => {
+    draggedId = track.id;
+  });
+
+  row.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropTargetId = track.id;
+  });
+
+  row.addEventListener("drop", async () => {
+    await moveTrack();
+  });
 
   const deleteBtn = document.createElement("button");
   deleteBtn.className = "delete-btn";
