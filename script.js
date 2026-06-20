@@ -84,6 +84,20 @@ async function deleteTrack(id) {
   await loadTracks(); // Re-fetch to keep UI in sync
 }
 
+async function renameTrack(id, newName) {
+  const { error } = await db
+    .from("track_list")
+    .update({ name: newName })
+    .eq("id", id);
+
+  if (error) {
+    console.error("Failed to rename track:", error.message);
+    return;
+  }
+
+  await loadTracks();
+}
+
 async function moveTrack() {
   if (!draggedId || !dropTargetId) return;
 
@@ -234,6 +248,39 @@ function renderMonthTimeline(sortedDayKeys, tracksFromEachDayBigGroup) {
   });
 }
 
+function enterEditMode(track, row, nameSpan) {
+  const input = document.createElement("input");
+
+  input.value = track.name;
+  input.className = "edit-track-input";
+
+  row.replaceChild(input, nameSpan);
+
+  input.focus();
+  input.select();
+
+  async function save() {
+    const newName = input.value.trim();
+
+    if (!newName) {
+      await loadTracks();
+      return;
+    }
+
+    await renameTrack(track.id, newName);
+  }
+
+  input.addEventListener("keydown", async (e) => {
+    if (e.key === "Enter") {
+      await save();
+    }
+  });
+
+  input.addEventListener("blur", async () => {
+    await save();
+  });
+}
+
 function createRow(track) {
   const row = document.createElement("div");
   row.className = "track-row";
@@ -270,6 +317,11 @@ function createRow(track) {
     window.open(`https://www.youtube.com/results?search_query=${q}`, "_blank");
 
     deleteTrack(track.id);
+  });
+
+   nameSpan.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    enterEditMode(track, row, nameSpan);
   });
 
   row.appendChild(deleteBtn);

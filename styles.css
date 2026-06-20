@@ -109,9 +109,16 @@ body {
   width: 100%;                /* NEW: underline animation only on name hover */
 }
 
-.track-row:focus {
-  outline: 2px solid white;
-  outline-offset: 2px;
+.track-name:hover::after {
+  width: 100%;
+}
+
+.edit-track-input {
+  background: black;
+  color: white;
+  border: 1px solid white;
+  font: inherit;
+  padding: 2px 4px;
 }
 
 /* INPUT */
