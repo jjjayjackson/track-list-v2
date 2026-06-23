@@ -144,6 +144,23 @@ async function savePositions() {
   }
 }
 
+async function autoCompleteFeature(searchTerm) {
+  if (!searchTerm) return [];
+
+  const { data, error } = await db
+    .from("autocomplete")
+    .select("name")
+    .ilike("name", `${searchTerm}%`)
+    .limit(5);
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return data.map(item => item.name);
+}
+
 // ==================== DATE HELPERS ====================
 // Nothing changed here — these just format dates for display.
 
@@ -330,12 +347,49 @@ function createRow(track) {
   return row;
 }
 
+const menu = document.getElementById("autocomplete-menu");
+
+function renderSuggestions(suggestions) {
+  menu.innerHTML = "";
+
+  if (suggestions.length === 0) {
+    menu.style.display = "none";
+    return;
+  }
+
+  suggestions.forEach(item => {
+    const div = document.createElement("div");
+    div.textContent = item;
+
+    div.addEventListener("click", () => {
+      input.value = item;
+      menu.style.display = "none";
+    });
+
+    menu.appendChild(div);
+  });
+
+  menu.style.display = "block";
+}
+
 // ==================== EVENT LISTENERS ====================
 
 trackInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     addTrack();
   }
+});
+
+const input = document.getElementById("Input");
+
+input.addEventListener("input", async (e) => {
+  const teamSearched = e.target.value;
+
+  const autoCompleteSuggestions = await autoCompleteFeature(teamSearched);
+
+ console.log(autoCompleteSuggestions);
+
+ renderSuggestions(autoCompleteSuggestions);
 });
 
 function updateTrackCount() {

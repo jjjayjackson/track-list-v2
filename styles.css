@@ -133,6 +133,21 @@ body {
   border-radius: 18px;
 }
 
+.autocomplete-menu {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  width: 100%;
+
+  background: black;
+  border: 1px solid #2a3139;
+  border-radius: 12px;
+
+  margin-bottom: 8px;
+
+  display: none;
+}
+
 #Input {
   width: 100%;
   border: 2px solid white;
@@ -143,6 +158,8 @@ body {
   font-size: 1rem;
   outline: none;
 }
+
+
 
 .month-timeline {
   position: fixed;
