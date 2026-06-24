@@ -18,7 +18,7 @@ const monthTimeline = document.getElementById("monthTimeline");
 const trackCount = document.getElementById("trackCount");
 
 let tracks = [];
-let selectedIndex = 0;
+let selectedIndex = -1;
 let currentSuggestions = [];
 
 // ==================== CORE DATA MANAGEMENT ====================
@@ -67,6 +67,9 @@ async function addTrack() {
   }
 
   trackInput.value = "";
+
+  await updateAutocompleteCount(name);
+
   await loadTracks(); // Re-fetch so the new row appears with the real server timestamp
 }
 
@@ -153,6 +156,7 @@ async function autoCompleteFeature(searchTerm) {
     .from("autocomplete")
     .select("name")
     .ilike("name", `${searchTerm}%`)
+    .order("count", { ascending: false })
     .limit(5);
 
   if (error) {
@@ -161,6 +165,30 @@ async function autoCompleteFeature(searchTerm) {
   }
 
   return data.map(item => item.name);
+}
+
+async function updateAutocompleteCount(trackName) {
+  const { data } = await db
+    .from("autocomplete")
+    .select("count")
+    .eq("name", trackName)
+    .maybeSingle();
+
+  if (data) {
+    await db
+      .from("autocomplete")
+      .update({
+        count: data.count + 1
+      })
+      .eq("name", trackName);
+  } else {
+    await db
+      .from("autocomplete")
+      .insert({
+        name: trackName,
+        count: 1
+      });
+  }
 }
 
 // ==================== DATE HELPERS ====================
@@ -389,7 +417,8 @@ trackInput.addEventListener("keydown", (e) => {
   if (
     e.key === "Enter" &&
     menu.style.display === "block" &&
-    currentSuggestions.length > 0
+    currentSuggestions.length > 0 &&
+    selectedIndex >= 0
   ) {
     e.preventDefault();
 
@@ -397,6 +426,18 @@ trackInput.addEventListener("keydown", (e) => {
       currentSuggestions[selectedIndex];
 
     menu.style.display = "none";
+
+    addTrack();
+
+    return;
+  }
+
+  if (e.key === "Enter") {
+    e.preventDefault();
+
+    menu.style.display = "none";
+
+    addTrack();
 
     return;
   }
@@ -407,13 +448,14 @@ trackInput.addEventListener("keydown", (e) => {
   ) {
     e.preventDefault();
 
-    selectedIndex = Math.min(
-      selectedIndex + 1,
-      currentSuggestions.length - 1
-    );
+    if (selectedIndex === currentSuggestions.length - 1) {
+      selectedIndex = -1;
+    } else {
+      selectedIndex++;
+    }
 
-    renderSuggestions(currentSuggestions);
-  }
+  renderSuggestions(currentSuggestions);
+}
 
   if (
     e.key === "ArrowUp" &&
@@ -421,13 +463,14 @@ trackInput.addEventListener("keydown", (e) => {
   ) {
     e.preventDefault();
 
-    selectedIndex = Math.max(
-      selectedIndex - 1,
-      0
-    );
-
-    renderSuggestions(currentSuggestions);
+    if (selectedIndex === -1) {
+    selectedIndex = currentSuggestions.length - 1;
+  } else {
+    selectedIndex--;
   }
+
+  renderSuggestions(currentSuggestions);
+}
 });
 
 const input = document.getElementById("Input");
@@ -435,7 +478,7 @@ const input = document.getElementById("Input");
 input.addEventListener("input", async (e) => {
   const teamSearched = e.target.value;
   const autoCompleteSuggestions = await autoCompleteFeature(teamSearched);
-  selectedIndex = 0;
+  selectedIndex = -1;
 
  // console.log(autoCompleteSuggestions);
 
