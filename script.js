@@ -18,6 +18,8 @@ const monthTimeline = document.getElementById("monthTimeline");
 const trackCount = document.getElementById("trackCount");
 
 let tracks = [];
+let selectedIndex = 0;
+let currentSuggestions = [];
 
 // ==================== CORE DATA MANAGEMENT ====================
 
@@ -350,6 +352,8 @@ function createRow(track) {
 const menu = document.getElementById("autocomplete-menu");
 
 function renderSuggestions(suggestions) {
+  currentSuggestions = suggestions;
+
   menu.innerHTML = "";
 
   if (suggestions.length === 0) {
@@ -357,12 +361,18 @@ function renderSuggestions(suggestions) {
     return;
   }
 
-  suggestions.forEach(item => {
+  suggestions.forEach((item, index) => {
     const div = document.createElement("div");
+
     div.textContent = item;
+    div.className = "autocomplete-item";
+
+    if (index === selectedIndex) {
+      div.classList.add("selected");
+    }
 
     div.addEventListener("click", () => {
-      input.value = item;
+      trackInput.value = item;
       menu.style.display = "none";
     });
 
@@ -375,8 +385,48 @@ function renderSuggestions(suggestions) {
 // ==================== EVENT LISTENERS ====================
 
 trackInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    addTrack();
+
+  if (
+    e.key === "Enter" &&
+    menu.style.display === "block" &&
+    currentSuggestions.length > 0
+  ) {
+    e.preventDefault();
+
+    trackInput.value =
+      currentSuggestions[selectedIndex];
+
+    menu.style.display = "none";
+
+    return;
+  }
+
+  if (
+    e.key === "ArrowDown" &&
+    currentSuggestions.length > 0
+  ) {
+    e.preventDefault();
+
+    selectedIndex = Math.min(
+      selectedIndex + 1,
+      currentSuggestions.length - 1
+    );
+
+    renderSuggestions(currentSuggestions);
+  }
+
+  if (
+    e.key === "ArrowUp" &&
+    currentSuggestions.length > 0
+  ) {
+    e.preventDefault();
+
+    selectedIndex = Math.max(
+      selectedIndex - 1,
+      0
+    );
+
+    renderSuggestions(currentSuggestions);
   }
 });
 
@@ -384,10 +434,10 @@ const input = document.getElementById("Input");
 
 input.addEventListener("input", async (e) => {
   const teamSearched = e.target.value;
-
   const autoCompleteSuggestions = await autoCompleteFeature(teamSearched);
+  selectedIndex = 0;
 
- console.log(autoCompleteSuggestions);
+ // console.log(autoCompleteSuggestions);
 
  renderSuggestions(autoCompleteSuggestions);
 });

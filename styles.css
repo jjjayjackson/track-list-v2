@@ -140,12 +140,25 @@ body {
   width: 100%;
 
   background: black;
-  border: 1px solid #2a3139;
+  border: 1px solid white;
   border-radius: 12px;
 
   margin-bottom: 8px;
 
   display: none;
+}
+
+.autocomplete-item {
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+.autocomplete-item:hover {
+  font-weight: 700;
+}
+
+.autocomplete-item.selected {
+  font-weight: 700;
 }
 
 #Input {
@@ -158,8 +171,6 @@ body {
   font-size: 1rem;
   outline: none;
 }
-
-
 
 .month-timeline {
   position: fixed;
